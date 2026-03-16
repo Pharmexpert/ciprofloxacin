@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="PharmFormula AI — Ципрофлоксацин қобиқли таблетка формуляцияларини баҳолаш ва оптималлаш тизими">
+    <title>PharmFormula AI — Фармацевтик формуляция оптимизатори</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+
+    <!-- ==================== HEADER ==================== -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" class="logo" onclick="showPage('dashboard')">
+                <div class="logo-icon">💊</div>
+                <span class="logo-text">PharmFormula AI</span>
+                <span class="logo-badge">v1.0</span>
+            </a>
+            <nav class="nav-tabs" id="navTabs">
+                <button class="nav-tab active" onclick="showPage('dashboard')">🏠 Дашборд</button>
+                <button class="nav-tab" onclick="showPage('allFormulations')">📋 Барча таркиблар</button>
+                <button class="nav-tab" onclick="showPage('comparison')">📊 Солиштириш</button>
+                <button class="nav-tab" onclick="showPage('excipientDb')">🧪 Моддалар базаси</button>
+                <button class="nav-tab" onclick="showPage('literature')">📚 Адабиётлар</button>
+                <button class="nav-tab" onclick="showPage('newFormulation')">➕ Янги таркиб</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <main class="main-content">
+
+        <!-- ========== DASHBOARD ========== -->
+        <div class="page active" id="page-dashboard">
+            <div class="dashboard-hero">
+                <h1>🏆 Топ 5 Формуляция — Ципрофлоксацин</h1>
+                <p>36 та формуляция 8 мезон бўйича баҳоланди. Қуйида энг яхши 5 таси келтирилган.</p>
+            </div>
+
+            <div class="stats-bar" id="statsBar"></div>
+            <div class="section-title"><span class="icon">🥇</span> Энг яхши 5 та формуляция</div>
+            <div class="top5-grid" id="top5Grid"></div>
+        </div>
+
+        <!-- ========== ALL FORMULATIONS ========== -->
+        <div class="page" id="page-allFormulations">
+            <div class="section-title"><span class="icon">📋</span> Барча формуляциялар рейтинги</div>
+            <div class="formulations-table-wrap">
+                <table class="formulations-table" id="allFormulationsTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Ном</th>
+                            <th>НД</th>
+                            <th>Дозалар</th>
+                            <th>Эриш</th>
+                            <th>Парчаланиш</th>
+                            <th>Сиқувчанлик</th>
+                            <th>Оқувчанлик</th>
+                            <th>Қобиқ</th>
+                            <th>Барқарорлик</th>
+                            <th>Биомавжуд.</th>
+                            <th>Хавфсизлик</th>
+                            <th>Умумий</th>
+                            <th>Баҳо</th>
+                        </tr>
+                    </thead>
+                    <tbody id="allFormulationsTbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ========== COMPARISON ========== -->
+        <div class="page" id="page-comparison">
+            <div class="section-title"><span class="icon">📊</span> Формуляцияларни солиштириш</div>
+            <div class="comparison-controls">
+                <select class="comparison-select" id="compareSelect1" onchange="updateComparison()"></select>
+                <select class="comparison-select" id="compareSelect2" onchange="updateComparison()"></select>
+            </div>
+            <div class="comparison-chart-wrap">
+                <div><canvas id="radarCompare"></canvas></div>
+                <div id="comparisonDetails"></div>
+            </div>
+        </div>
+
+        <!-- ========== EXCIPIENT DATABASE ========== -->
+        <div class="page" id="page-excipientDb">
+            <div class="section-title"><span class="icon">🧪</span> Ёрдамчи моддалар базаси</div>
+            <div class="search-bar">
+                <input type="text" class="search-input" id="excipientSearch" placeholder="Модда номини қидириш..."
+                    oninput="filterExcipients()">
+            </div>
+            <div class="filter-buttons" id="excipientFilters"></div>
+            <div class="excipient-grid" id="excipientGrid" style="margin-top:1rem;"></div>
+        </div>
+
+        <!-- ========== LITERATURE ========== -->
+        <div class="page" id="page-literature">
+            <div class="literature-section">
+                <div class="section-title"><span class="icon">📚</span> Илмий адабиётлар шарҳи</div>
+                <p style="color:var(--text-secondary);margin-bottom:1.5rem;">Ципрофлоксацин таблетка формуляцияси, AI/ML
+                    инструментлари ва биофармацевтик башорат бўйича илмий мақолалар</p>
+                <div id="literatureList"></div>
+            </div>
+        </div>
+
+        <!-- ========== NEW FORMULATION ========== -->
+        <div class="page" id="page-newFormulation">
+            <div class="new-form-container">
+                <div class="section-title"><span class="icon">➕</span> Янги формуляцияни баҳолаш</div>
+                <p style="color:var(--text-secondary);margin-bottom:1.5rem;">Ўз таркибингизни киритинг ва баҳолаш
+                    натижасини кўринг</p>
+                <div class="form-group">
+                    <label>Дори номи</label>
+                    <input type="text" id="newName" placeholder="Масалан: Ципрофлоксацин Янги">
+                </div>
+                <div class="form-group">
+                    <label>Ядро таркиби (Core)</label>
+                    <div id="newCoreIngredients"></div>
+                    <button class="btn btn-secondary btn-sm" onclick="addIngredientRow('core')"
+                        style="margin-top:8px;">+ Модда қўшиш</button>
+                </div>
+                <div class="form-group">
+                    <label>Қобиқ таркиби (Coating)</label>
+                    <div id="newCoatingIngredients"></div>
+                    <button class="btn btn-secondary btn-sm" onclick="addIngredientRow('coating')"
+                        style="margin-top:8px;">+ Модда қўшиш</button>
+                </div>
+                <button class="btn btn-primary" onclick="evaluateNewFormulation()" style="margin-top:1rem;">🔬
+                    Баҳолаш</button>
+                <div id="newFormulationResult" style="margin-top:1.5rem;"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-org">«Фармацевтика маҳсулотлари хавфсизлиги маркази» давлат муассасаси</div>
+            <div class="footer-author">Зайнидинов А.О., илмий раҳбар: Джалилов Х.К.</div>
+            <div class="footer-copy">© Барча ҳуқуқлар ҳимояланган.</div>
+        </div>
+    </footer>
+
+    <!-- ==================== DETAIL MODAL ==================== -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <div class="modal-header" id="modalHeader"></div>
+            <div class="radar-container"><canvas id="radarDetail"></canvas></div>
+            <div class="criteria-grid" id="modalCriteria"></div>
+            <h3 style="margin:1.5rem 0 0.8rem;font-size:1rem;">📝 Тавсиялар</h3>
+            <ul class="recommendations-list" id="modalRecommendations"></ul>
+            <h3 style="margin:1.5rem 0 0.8rem;font-size:1rem;">🧪 Таркиб</h3>
+            <table class="composition-table" id="modalComposition">
+                <thead>
+                    <tr>
+                        <th>Модда</th>
+                        <th>Категория</th>
+                        <th>Миқдор</th>
+                        <th>Оптимал</th>
+                    </tr>
+                </thead>
+                <tbody id="modalCompositionBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/excipients.js"></script>
+    <script src="js/formulations.js"></script>
+    <script src="js/scoring.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+
+</html>
